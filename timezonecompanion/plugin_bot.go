@@ -87,6 +87,7 @@ func (p *Plugin) AddCommands() {
 			}
 			// Multiple zones matching user input
 			note := ""
+			zone := ""
 			if len(zones) > 1 {
 				if len(zones) > 10 {
 					if parsed.Context().Value(paginatedmessages.CtxKeyNoPagination) != nil {
@@ -98,29 +99,37 @@ func (p *Plugin) AddCommands() {
 				}
 
 				matches := ""
-				for n, v := range zones {
-					if s := StrZone(v); n != 0 && s != "" {
+				for _, v := range zones {
+					if s := StrZone(v); s != "" {
 						matches += s + "\n"
 					}
 				}
-				// "matches" now contains all "zones" except "zones[0]"
+				// "matches" now contains all zones, as newline-separated list
 
-				// First (and thus no) zones exactly match user input
-				if StrZone(zones[0]) != parsed.Args[0].Str() {
-					matches = StrZone(zones[0]) + matches
+				// Check whether the requested zone has an exact match in zones
+				found := false
+				for n, candidate := range zones {
+					if strings.ToLower(candidate) == strings.ToLower(parsed.Args[0].Str()) {
+						found = true
+						// Select matching zone
+						zone = zones[n]
+						// Set a note for the user
+						note = "Other matching timezones were found, you can reuse the command with any of them:\n" + matches
+					}
+				}
+				if !found {
 					out := "More than 1 result, reuse the command with a one of the following:\n" + matches + "\n" + userTZ
 					return out, nil
-				// First of multiple matching zones *exactly* matches user input
-				} else if StrZone(zones[0]) == parsed.Args[0].Str() {
-					// First zone (which matches) will be selected a few lines from now, so we just set a note for the user
-					note = "Other matching timezones were found, you can reuse the command with any of them:\n" + matches
 				}
+			} else {
+				zone = zones[0]
 			}
 
-			zone := zones[0]
+			// Here, either `zones` is of length 1, or one zone of several is an exact match
+			// Either way, `zone` is already set to the proper value
 			loc, err := time.LoadLocation(zone)
 			if err != nil {
-				return "Unknown timezone", nil
+				return fmt.Sprintf("Unknown timezone `%s`", zone), nil
 			}
 
 			name, _ := time.Now().In(loc).Zone()
