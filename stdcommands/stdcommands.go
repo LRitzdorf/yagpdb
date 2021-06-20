@@ -20,20 +20,21 @@ import (
 	"github.com/jonas747/yagpdb/stdcommands/dogfact"
 	"github.com/jonas747/yagpdb/stdcommands/findserver"
 	"github.com/jonas747/yagpdb/stdcommands/globalrl"
-	"github.com/jonas747/yagpdb/stdcommands/howlongtobeat"
 	"github.com/jonas747/yagpdb/stdcommands/guildunavailable"
+	"github.com/jonas747/yagpdb/stdcommands/howlongtobeat"
 	"github.com/jonas747/yagpdb/stdcommands/info"
 	"github.com/jonas747/yagpdb/stdcommands/invite"
 	"github.com/jonas747/yagpdb/stdcommands/leaveserver"
+	"github.com/jonas747/yagpdb/stdcommands/listflags"
 	"github.com/jonas747/yagpdb/stdcommands/listroles"
 	"github.com/jonas747/yagpdb/stdcommands/memstats"
-	"github.com/jonas747/yagpdb/stdcommands/mentionrole"
 	"github.com/jonas747/yagpdb/stdcommands/ping"
 	"github.com/jonas747/yagpdb/stdcommands/poll"
 	"github.com/jonas747/yagpdb/stdcommands/roll"
 	"github.com/jonas747/yagpdb/stdcommands/setstatus"
 	"github.com/jonas747/yagpdb/stdcommands/simpleembed"
 	"github.com/jonas747/yagpdb/stdcommands/sleep"
+	"github.com/jonas747/yagpdb/stdcommands/statedbg"
 	"github.com/jonas747/yagpdb/stdcommands/stateinfo"
 	"github.com/jonas747/yagpdb/stdcommands/throw"
 	"github.com/jonas747/yagpdb/stdcommands/toggledbg"
@@ -86,7 +87,6 @@ func (p *Plugin) AddCommands() {
 		customembed.Command,
 		simpleembed.Command,
 		currenttime.Command,
-		mentionrole.Command,
 		listroles.Command,
 		memstats.Command,
 		wouldyourather.Command,
@@ -117,13 +117,15 @@ func (p *Plugin) AddCommands() {
 		sleep.Command,
 		toggledbg.Command,
 		globalrl.Command,
+		listflags.Command,
 	)
+
+	statedbg.Commands()
 
 }
 
 func (p *Plugin) BotInit() {
 	eventsystem.AddHandlerAsyncLastLegacy(p, ping.HandleMessageCreate, eventsystem.EventMessageCreate)
-	mentionrole.AddScheduledEventListener()
 }
 
 func RegisterPlugin() {
